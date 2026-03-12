@@ -1,0 +1,31 @@
+#python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+#pytest
+.pytest_cache
+
+#venv
+venv/
+env/
+.env
+
+#ide
+.vscode/
+.idea/
+*.swp
+
+#os
+.DS_Store
+Thumbs.db
+
+#model gens
+models/
+data/
+
+#pdfs
+*.pdf
+
+#datasets
+*.csv
