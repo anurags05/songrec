@@ -19,6 +19,9 @@ A scalable, content-based music recommendation engine built with Python, Scikit-
    ```bash
    pytest tests/test_recommender.py
    ```
+3. Download datasets from kaggle:
+[1921-2020 tracks](https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-19212020-600k-tracks)
+[Spotify 1.2m](https://www.kaggle.com/datasets/rodolfofigueroa/spotify-12m-songs)
 
 ## Usage
 
@@ -34,8 +37,18 @@ python main.py
 
 Example:
 ```bash
-python main.py --sample 100000
+python main.py
 ```
+```
+--- Song Recommendation System ---
+1. Recommend by Song
+2. Recommend by Artist
+3. Exit
+Select an option (1-3): 1
+Enter song name: Bullet In The Head
+```
+
+
 
 ## Dataset Requirements
 The system expects a CSV with at least:
