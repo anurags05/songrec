@@ -36,9 +36,7 @@ python main.py
 - `--rebuild`: Force the system to rebuild the feature matrix and model.
 
 Example:
-```bash
-python main.py
-```
+
 ```
 --- Song Recommendation System ---
 1. Recommend by Song
