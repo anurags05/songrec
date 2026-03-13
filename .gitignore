@@ -29,3 +29,9 @@ data/
 
 #datasets
 *.csv
+
+.qwen/
+gha-creds-*.json
+
+#workflows
+.github/workflows

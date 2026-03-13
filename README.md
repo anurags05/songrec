@@ -2,6 +2,10 @@
 
 A scalable, content-based music recommendation engine built with Python, Scikit-Learn, and Pandas.
 
+
+Note: See `explanation.md` for a walkthrough on how the project works and what each file does.
+
+
 ## Features
 - **Scalable**: Efficiently handles 1M+ rows using sparse matrices and index-based search.
 - **Memory Optimized**: Uses specialized dtypes to reduce memory footprint.
@@ -19,8 +23,8 @@ A scalable, content-based music recommendation engine built with Python, Scikit-
    ```bash
    pytest tests/test_recommender.py
    ```
-3. Download datasets from kaggle:
-[1921-2020 tracks](https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-19212020-600k-tracks)
+3. Download datasets from kaggle:\
+[1921-2020 tracks](https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-19212020-600k-tracks)\
 [Spotify 1.2m](https://www.kaggle.com/datasets/rodolfofigueroa/spotify-12m-songs)
 
 ## Usage
@@ -30,9 +34,11 @@ Run the main script:
 python main.py
 ```
 
+> Note: Initial run of the `main.py` script takes longer due to building and optimising of models.
+
 ### Script Arguments
 - `--dataset`: Path to the CSV dataset (defaults to `tracks_features.csv`).
-- `--sample N`: Use a random sample of N rows for faster development.
+- `--sample N`: Use a random sample of N rows for faster development. For example: `--sample 1000`
 - `--rebuild`: Force the system to rebuild the feature matrix and model.
 
 Example:
