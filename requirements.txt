@@ -6,3 +6,4 @@ rapidfuzz
 tqdm
 joblib
 pytest
+textual

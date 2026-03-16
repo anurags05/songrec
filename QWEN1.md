@@ -8,7 +8,7 @@ A **scalable, content-based music recommendation engine** built with Python that
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  data_loader.py │ ──► │  features.py     │ ──► │ recommender.py  │
+│  data_loader.py │ ──►  │  features.py     │ ──►  │ recommender.py   │
 │  (ETL + Clean)  │     │ (TF-IDF + Scale) │     │ (KNN + Fuzzy)   │
 └─────────────────┘     └──────────────────┘     └─────────────────┘
                                 │
@@ -23,12 +23,22 @@ A **scalable, content-based music recommendation engine** built with Python that
 
 | File | Purpose |
 |------|---------|
-| `main.py` | CLI entry point, model pipeline orchestration, caching logic |
-| `src/data_loader.py` | Data ingestion, column normalization, memory optimization |
-| `src/features.py` | TF-IDF vectorization for text, StandardScaler for audio features |
-| `src/recommender.py` | KNN with cosine similarity, fuzzy matching via `rapidfuzz` |
-| `src/utils.py` | Logging, dataset hashing, directory management |
-| `tests/test_recommender.py` | Pytest-based unit tests for core logic |
+| `main.py` | CLI entry point, model pipeline orchestration, caching logic. |
+| `src/data_loader.py` | Data ingestion, cleaning of data, memory optimization. Also standardizes columns names (e.g., `genre`, `artist`) to reduce memory footprint.|
+| `src/features.py` | This is the feature engineering pipeline. Combines -> TF-IDF vectorization for text metadata (`song name`,`artist`), StandardScaler for audio features. |
+| `src/recommender.py` | Uses KNN with cosine similarity to find similar songs and artists, fuzzy matching via `rapidfuzz` to handle spelling errors. |
+| `src/utils.py` | Utility set for Logging, dataset hashing, directory management. |
+| `tests/test_recommender.py` | Pytest-based unit tests to verif core logic and data processing.|
+
+## Key Techniques
+
+1. **Content-Based Filtering**: Recommends items based on their features rather than user behavior, making it effective for cold-start scenarios where no user history is available.
+2. **TF-IDF (Term Frequency-Inverse Document Frequency)**: Used to convert text metadata (names, genres) into numeric vectors, emphasizing unique keywords.
+3. **Feature Scaling**: Standardizes numeric audio features (like `loudness` or `tempo`) to ensure they contribute equally to the similarity calculation.
+4. **Sparse Matrix Representation**: Uses `scipy.sparse` to store feature vectors efficiently, significantly reducing memory usage for datasets with high-dimensional text features.
+5. **K-Nearest Neighbors (KNN)**: An unsupervised learning algorithm used for similarity search, utilizing **Cosine Similarity** to measure the distance between songs in the feature space.
+6. **Fuzzy String Matching**: Uses the `rapidfuzz` library to improve user experience by finding the closest match for song or artist names even if the search query contains typos.
+7. **Model Persistence**: Uses `joblib`  to save trained models in cache allowing for instant startup on future runs.
 
 ## Building and Running
 
@@ -44,6 +54,11 @@ pip install -r requirements.txt
 
 # Run the application
 python main.py
+
+or 
+
+# Run the Terminal UI application 
+python tui.py
 
 # Run with custom dataset
 python main.py --dataset /path/to/tracks_features.csv
@@ -65,6 +80,7 @@ pytest tests/test_recommender.py
 | `--dataset` | Path to CSV dataset | `tracks_features.csv` |
 | `--sample N` | Use N random rows for testing | `None` |
 | `--rebuild` | Force model rebuild | `False` |
+| `--tui` | Run project with terminal UI | `False` |
 
 ### Dataset Requirements
 
@@ -127,11 +143,22 @@ songrec/
 3. **Hybrid Features**: Combines TF-IDF (text) + StandardScaler (numeric) via `hstack`
 4. **Fuzzy Matching**: `rapidfuzz` for typo-tolerant search
 
-### Known Limitations / WIP
+---
 
-- GUI integration planned (see `futureplan.md` - mentions `customtkinter`)
-- Genre handling: Many tracks default to "unknown"
+## Known Limitations & Future Work
+
+### Current Limitations
+- Genre data often defaults to "unknown" in the dataset
 - No collaborative filtering (content-based only)
+- CLI-only interface (GUI planned with `customtkinter`)
+
+### Planned Enhancements
+- GUI integration using `customtkinter`
+- Improved genre-based filtering
+- Dynamic dataset hot-loading
+- Advanced hybrid search (potential collaborative filtering)
+
+---
 
 ## Quick Reference
 

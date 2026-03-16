@@ -71,7 +71,7 @@ class Recommender:
         # Compute average feature vector for the artist
         artist_indices = artist_songs.index
         artist_features = feature_matrix[artist_indices]
-        avg_vector = artist_features.mean(axis=0)
+        avg_vector = np.asarray(artist_features.mean(axis=0))
 
         # Query index
         distances, indices = self.model.kneighbors(avg_vector, n_neighbors=n + artist_songs.shape[0])
