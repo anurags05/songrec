@@ -154,6 +154,85 @@ class ResultScreen(Screen):
             pass
 
 
+class GenreListScreen(Screen):
+    """Screen to display available genres."""
+
+    BINDINGS = [
+        Binding("escape", "go_back", "Back", show=True),
+        Binding("up", "scroll_up", "↑", show=True),
+        Binding("down", "scroll_down", "↓", show=True),
+        Binding("pageup", "page_up", "PgUp", show=True),
+        Binding("pagedown", "page_down", "PgDn", show=True),
+        Binding("g", "browse_genre", "Browse", show=True),
+    ]
+
+    def __init__(self, genres: list):
+        super().__init__()
+        self.genres = genres
+
+    def compose(self) -> ComposeResult:
+        yield Header()
+        yield Container(
+            Vertical(
+                Static("🎼 Available Genres", id="genre-title"),
+                Static(f"Total: {len(self.genres)} genres", id="genre-count"),
+                ScrollableContainer(
+                    Static(self._format_genres(), id="genre-list"),
+                    id="genre-scroll",
+                ),
+                Button("🔍 Browse by Genre", id="btn-browse", variant="primary"),
+                Button("⬅ Back", id="btn-back", variant="default"),
+            ),
+            id="genre-container",
+        )
+        yield Footer()
+
+    def _format_genres(self) -> str:
+        """Format genres as a numbered list."""
+        lines = []
+        for i, genre in enumerate(self.genres[:100], 1):
+            lines.append(f"{i:3}. {genre}")
+        if len(self.genres) > 100:
+            lines.append(f"\n[dim]... and {len(self.genres) - 100} more[/dim]")
+        return "\n".join(lines)
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "btn-browse":
+            self.app.push_screen("search_genre")
+        elif event.button.id == "btn-back":
+            self.app.pop_screen()
+
+    def action_go_back(self) -> None:
+        self.app.pop_screen()
+
+    def action_browse_genre(self) -> None:
+        self.app.push_screen("search_genre")
+
+    def action_scroll_up(self) -> None:
+        try:
+            self.query_one("#genre-scroll", ScrollableContainer).scroll_up()
+        except Exception:
+            pass
+
+    def action_scroll_down(self) -> None:
+        try:
+            self.query_one("#genre-scroll", ScrollableContainer).scroll_down()
+        except Exception:
+            pass
+
+    def action_page_up(self) -> None:
+        try:
+            self.query_one("#genre-scroll", ScrollableContainer).page_up()
+        except Exception:
+            pass
+
+    def action_page_down(self) -> None:
+        try:
+            self.query_one("#genre-scroll", ScrollableContainer).page_down()
+        except Exception:
+            pass
+
+
 class MainMenu(Screen):
     """Main menu screen for the TUI."""
 
@@ -161,6 +240,7 @@ class MainMenu(Screen):
         Binding("q", "quit", "Quit", show=True),
         Binding("1", "search_by_song", "By Song", show=True),
         Binding("2", "search_by_artist", "By Artist", show=True),
+        Binding("3", "browse_genres", "Genres", show=True),
         Binding("r", "rebuild", "Rebuild Models", show=False),
         Binding("up", "focus_previous", "↑", show=True),
         Binding("down", "focus_next", "↓", show=True),
@@ -174,6 +254,7 @@ class MainMenu(Screen):
                 Static("Choose a search option:", id="menu-subtitle"),
                 Button("🎶 Search by Song", id="btn-song", variant="primary"),
                 Button("🎤 Search by Artist", id="btn-artist", variant="primary"),
+                Button("🎼 Browse by Genre", id="btn-genre", variant="primary"),
                 Button("🔄 Rebuild Models", id="btn-rebuild", variant="default"),
                 Button("❌ Exit", id="btn-exit", variant="error"),
             ),
@@ -189,6 +270,8 @@ class MainMenu(Screen):
             self.app.push_screen("search_song")
         elif event.button.id == "btn-artist":
             self.app.push_screen("search_artist")
+        elif event.button.id == "btn-genre":
+            self.app.browse_genres()
         elif event.button.id == "btn-rebuild":
             self.app.rebuild_models()
         elif event.button.id == "btn-exit":
@@ -202,6 +285,9 @@ class MainMenu(Screen):
 
     def action_search_by_artist(self) -> None:
         self.app.push_screen("search_artist")
+
+    def action_browse_genres(self) -> None:
+        self.app.browse_genres()
 
     def action_rebuild(self) -> None:
         self.app.rebuild_models()
@@ -288,7 +374,7 @@ class SongRecommenderApp(App):
         background: #191724;
     }
 
-    #menu-container, #search-container, #result-container, #loading-container {
+    #menu-container, #search-container, #result-container, #loading-container, #genre-container {
         align: center middle;
         height: 100%;
     }
@@ -372,6 +458,34 @@ class SongRecommenderApp(App):
         text-align: center;
         padding: 1 0;
         color: #908caa;
+    }
+
+    #genre-title {
+        text-align: center;
+        text-style: bold;
+        padding: 1 0 1 0;
+        color: #f6c177;
+    }
+
+    #genre-count {
+        text-align: center;
+        padding: 0 0 1 0;
+        color: #908caa;
+    }
+
+    #genre-list {
+        background: #1F1D2E;
+        padding: 1 2;
+        border: solid #9ccfd8;
+        margin-top: 1;
+        color: #e0def4;
+        width: 100%;
+    }
+
+    #genre-scroll {
+        width: 100%;
+        height: 15;
+        margin: 1 0;
     }
 
     #result-title {
@@ -574,15 +688,19 @@ class SongRecommenderApp(App):
                 results = self.recommender.get_recommendations(
                     query, self.df, self.feature_matrix
                 )
-            else:
+            elif search_type == "artist":
                 results = self.recommender.get_recommendations_by_artist(
+                    query, self.df, self.feature_matrix
+                )
+            elif search_type == "genre":
+                results = self.recommender.get_recommendations_by_genre(
                     query, self.df, self.feature_matrix
                 )
 
             self.call_from_thread(
                 self._show_results,
                 results,
-                "Song" if search_type == "song" else "Artist",
+                "Song" if search_type == "song" else ("Artist" if search_type == "artist" else "Genre"),
                 query,
             )
         except Exception as e:
@@ -591,6 +709,25 @@ class SongRecommenderApp(App):
 
     def _show_results(self, results: pd.DataFrame, search_type: str, query: str):
         self.push_screen(ResultScreen(results, search_type, query))
+
+    @work(exclusive=True, thread=True)
+    def browse_genres(self):
+        """Get list of available genres."""
+        try:
+            if not self.initialized:
+                self.call_from_thread(
+                    self.notify, "Models not ready yet", severity="warning"
+                )
+                return
+
+            genres = self.recommender.get_available_genres(self.df, min_count=10)
+            self.call_from_thread(self._show_genres, genres)
+        except Exception as e:
+            logger.error(f"Error loading genres: {e}")
+            self.call_from_thread(self.notify, f"Error: {str(e)}", severity="error")
+
+    def _show_genres(self, genres: list):
+        self.push_screen(GenreListScreen(genres))
 
     @work(exclusive=True, thread=True)
     def rebuild_models(self):
@@ -639,6 +776,14 @@ def main():
             title="🎤 Search by Artist",
         ),
         name="search_artist",
+    )
+    app.install_screen(
+        SearchScreen(
+            search_type="genre",
+            placeholder="Enter genre name...",
+            title="🎼 Search by Genre",
+        ),
+        name="search_genre",
     )
     app.install_screen(LoadingScreen, name="loading")
 

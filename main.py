@@ -101,8 +101,10 @@ def main():
         print("\n--- Song Recommendation System ---")
         print("1. Recommend by Song")
         print("2. Recommend by Artist")
-        print("3. Exit")
-        choice = input("Select an option (1-3): ")
+        print("3. Recommend by Genre")
+        print("4. List Available Genres")
+        print("5. Exit")
+        choice = input("Select an option (1-5): ")
 
         if choice == "1":
             song = input("Enter song name: ")
@@ -112,7 +114,7 @@ def main():
                 print(recs.to_string(index=False))
             except Exception as e:
                 print(f"Error: {e}")
-        
+
         elif choice == "2":
             artist = input("Enter artist name: ")
             try:
@@ -121,8 +123,28 @@ def main():
                 print(recs.to_string(index=False))
             except Exception as e:
                 print(f"Error: {e}")
-        
+
         elif choice == "3":
+            genre = input("Enter genre name: ")
+            try:
+                recs = recommender.get_recommendations_by_genre(genre, df, feature_matrix)
+                print(f"\nRecommended Songs for genre '{genre}':")
+                print(recs.to_string(index=False))
+            except Exception as e:
+                print(f"Error: {e}")
+
+        elif choice == "4":
+            try:
+                genres = recommender.get_available_genres(df, min_count=10)
+                print(f"\nAvailable Genres (showing top {len(genres)} with 10+ songs):")
+                for i, g in enumerate(genres[:50], 1):
+                    print(f"  {i}. {g}")
+                if len(genres) > 50:
+                    print(f"  ... and {len(genres) - 50} more")
+            except Exception as e:
+                print(f"Error: {e}")
+
+        elif choice == "5":
             print("Goodbye!")
             break
         else:

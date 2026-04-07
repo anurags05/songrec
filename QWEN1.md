@@ -1,5 +1,5 @@
 # Song Recommendation System - Project Context
-
+https://fluffle.cc/songrec2
 ## Project Overview
 
 A **scalable, content-based music recommendation engine** built with Python that suggests songs based on audio features and metadata similarity. The system handles large datasets (1M+ tracks) using sparse matrices, memory optimization, and efficient nearest-neighbor search.
@@ -8,7 +8,7 @@ A **scalable, content-based music recommendation engine** built with Python that
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  data_loader.py │ ──►  │  features.py     │ ──►  │ recommender.py   │
+│  data_loader.py │ ──► │  features.py     │ ──►│ recommender.py  │
 │  (ETL + Clean)  │     │ (TF-IDF + Scale) │     │ (KNN + Fuzzy)   │
 └─────────────────┘     └──────────────────┘     └─────────────────┘
                                 │

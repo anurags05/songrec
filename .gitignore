@@ -1,3 +1,17 @@
+#manual ignores
+font.py
+font2.py
+
+
+
+
+
+
+
+
+
+
+
 #python cache
 __pycache__/
 *.py[cod]
